@@ -7,7 +7,7 @@
 * @param x - значение параметра x
 * @return Рассчитанное значение
 */
-double getA(double x, const double y, const double z);
+double getA(const double x, const double y, const double z);
 /**
 * @brief Рассчитывает значение функции B
 * @param x - значение параметра x
@@ -23,9 +23,9 @@ double getB(const double x, const double y, const double z);
 int main(void)
 {
     /*Объявляем константы*/
-    const double x = 2.2f;
-    const double y = 9.2f;
-    const double z = 10.2f;
+    const double x = 2.2;
+    const double y = 9.2;
+    const double z = 10.2;
 
     /*Вывод с нужной точностью*/
     printf("A = %.6f\n", getA(x, y, z));
@@ -35,9 +35,9 @@ int main(void)
 
 double getA(const double x, const double y, const double z)
 {
-    return (log(z + x * x) + sin(x / y) * sin(x / y));
+    return (log(z + x * x) + pow(sin(x / y), 2));
 }
 double getB(const double x, const double y, const double z)
 {
-    return ((-z) * (x + sqrt(x + z))) / (x - sqrt(abs(x - y)));
+    return exp(-(z)) * ((x + sqrt(x + z)) / (x - sqrt(fabs(x - y))));
 }
