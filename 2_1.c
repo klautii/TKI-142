@@ -9,21 +9,21 @@
  * @param a Длина ребра куба.
  * @return Площадь одной грани.
  */
-    double face_area(double a);
+    double face_area(const double a);
 
 /**
  * @brief Вычисляет площадь полной поверхности куба.
  * @param a Длина ребра куба.
  * @return Площадь полной поверхности.
  */
-double total_surface_area(double a);
+double total_surface_area(const double a);
 
 /**
  * @brief Вычисляет объем куба.
  * @param a Длина ребра куба.
  * @return Объем куба.
  */
-double volume(double a);
+double volume(const double a);
 
 /**
  * @brief Безопасно считывает число с плавающей точкой.
@@ -34,7 +34,7 @@ double input(void);
 
 int main(void) {
     printf("Введите длину ребра куба: ");
-    double a = input();
+    const double a = input();
 
     printf("Площадь одной грани: %.2f\n", face_area(a));
     printf("Площадь полной поверхности: %.2f\n", total_surface_area(a));
@@ -44,15 +44,15 @@ int main(void) {
 }
 
 
-double face_area(double a) {
+double face_area(const double a) {
     return a * a;
 }
 
-double total_surface_area(double a) {
+double total_surface_area(const double a) {
     return 6 * a * a;
 }
 
-double volume(double a) {
+double volume(const double a) {
     return a * a * a;
 }
 
