@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
@@ -35,23 +35,24 @@ bool isSharpTriangle(const double x, const double y, const double z);
 
 int main(void)
 {
-    puts("Введите длину 1 стороны x треугольника ");
+    printf("Введите длину 1 стороны x треугольника \n");
     const double x = PInput();
-    puts("Введите длину 2 стороны y треугольника ");
+    printf("Введите длину 2 стороны y треугольника \n");
     const double y = PInput();
-    puts("Введите длину 3 стороны z треугольника ");
+    printf("Введите длину 3 стороны z треугольника \n");
     const double z = PInput();
     if (isSharpTriangle(x, y, z))
     {
-        puts("треугольник остроугольный");
+        printf("треугольник остроугольный\n");
     }
     else
     {
-        puts("треугольник неостроугольный");
+        printf("треугольник неостроугольный\n");
     }
 
     return 0;
 }
+
 double Input(void)
 {
     double value = 0.0;
@@ -62,17 +63,18 @@ double Input(void)
     }
     return value;
 }
+
 double PInput(void)
 {
     double value = Input();
-    if (value <= 0)
-        if (value <= DBL_EPSILON)
-        {
-            puts("Некорректное значение длины");
-            exit(EXIT_FAILURE);
-        }
+    if (value <= DBL_EPSILON)
+    {
+        puts("Некорректное значение длины");
+        exit(EXIT_FAILURE);
+    }
     return value;
 }
+
 bool isSharpTriangle(const double x, const double y, const double z)
 {
     return (pow(x, 2) < (pow(y, 2) + pow(z, 2)));
