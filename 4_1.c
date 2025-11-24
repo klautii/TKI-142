@@ -40,10 +40,9 @@ void printArray(const int* arr, const size_t size);
 
 /**
  * @brief Проверяет корректность ввода целого числа и возвращает его.
- * @param message Сообщение для пользователя.
  * @return Введенное целое число.
  */
-int validateNumber(const char* message);
+int validateNumber();
 
 /**
  * @brief Выполняет задание 1: суммирует четные элементы, превышающие пороговое значение.
@@ -71,12 +70,6 @@ int* multiplyEvenPositiveElements(const int* arr, int* arr2, const size_t size);
 int searchIndexPair(const int* arr, const size_t size);
 
 /**
- * @brief Получает выбор пользователя для способа заполнения массива.
- * @return Выбор пользователя.
- */
-int getFillChoice();
-
-/**
  * @brief Перечисление для выбора способа заполнения массива.
  */
 enum TASK {
@@ -85,20 +78,27 @@ enum TASK {
 };
 
 /**
+ * @brief Освобождает выделенную память для массива.
+ * @param arr Указатель на массив.
+ */
+void freeArray(int* arr);
+
+/**
 * @brief Основная функция программы.
 * @return Возвращает 0 в случае успешного выполнения программы.
 */
 int main() {
-    setlocale(LC_ALL, "Russian");
+    char* locale = setlocale(LC_ALL, "");
     size_t size = validateInput("Введите количество элементов в массиве: ");
 
     int* arr = iArray(size);
 
+    // Выбор способа заполнения массива
     printf("\nКаким способом вы хотите заполнить массив?\n"
         "Случайные числа - %d\n"
         "Ввод с клавиатуры - %d\n", RANDOM, KEYBOARD);
 
-    int choice = getFillChoice();
+    int choice = validateNumber();
 
     switch (choice) {
     case RANDOM:
@@ -108,8 +108,8 @@ int main() {
         fillArrayKeyboard(arr, size);
         break;
     default:
-        fprintf(stderr, "Неправильный выбор способа заполнения массива!\n");
-        free(arr);
+        fprintf(stderr, "Неправильный номер задания!\n");
+        freeArray(arr);
         exit(EXIT_FAILURE);
     }
 
@@ -122,8 +122,7 @@ int main() {
     int* arr2 = iArray(size);
     printArray(multiplyEvenPositiveElements(arr, arr2, size), size);
 
-    free(arr2);
-    arr2 = NULL;
+    freeArray(arr2);
 
     int pairIndex = searchIndexPair(arr, size);
     if (pairIndex == -1) {
@@ -133,34 +132,9 @@ int main() {
         printf("\nИндекс первой пары соседних элементов с разными знаками: %d\n", pairIndex);
     }
 
-    free(arr);
-    arr = NULL;
+    freeArray(arr);
 
     return 0;
-}
-
-int getFillChoice() {
-    int input;
-
-    printf("Введите ваш выбор: ");
-    if (scanf("%d", &input) != 1) {
-        fprintf(stderr, "Ошибка ввода выбора способа заполнения массива!\n");
-        exit(EXIT_FAILURE);
-    }
-
-    return input;
-}
-
-int validateNumber(const char* message) {
-    int input;
-
-    printf("%s", message);
-    if (scanf("%d", &input) != 1) {
-        fprintf(stderr, "Ошибка ввода числа!\n");
-        exit(EXIT_FAILURE);
-    }
-
-    return input;
 }
 
 int validateInput(const char* message) {
@@ -168,29 +142,40 @@ int validateInput(const char* message) {
     printf("%s", message);
 
     if (scanf("%d", &input) != 1 || input <= 0) {
-        fprintf(stderr, "Размер массива должен быть больше нуля.\n");
+        fprintf(stderr, "Ошибка ввода! Размер массива должен быть целым числом больше нуля.\n");
         exit(EXIT_FAILURE);
     }
 
     return input;
 }
 
-int* iArray(const size_t size) {
-    int* arr = (int*)malloc(size * sizeof(int));
-    if (arr == NULL) {
-        fprintf(stderr, "Ошибка выделения памяти!\n");
+int validateNumber() {
+    int input;
+    if (scanf("%d", &input) != 1) {
+        fprintf(stderr, "Ошибка ввода числа!\n");
         exit(EXIT_FAILURE);
     }
+    return input;
+}
 
+int* iArray(const size_t size) {
+    int* arr = (int*)calloc(size, sizeof(int));
+    if (arr == NULL) {
+        fprintf(stderr, "Ошибка выделения памяти\n");
+        exit(EXIT_FAILURE);
+    }
     return arr;
 }
 
 void fillArrayRandom(int* arr, const size_t size) {
-    const int lowerBound = validateNumber("\nВведите нижнюю границу случайных чисел: ");
-    const int upperBound = validateNumber("Введите верхнюю границу случайных чисел: ");
+    printf("\nВведите нижнюю границу случайных чисел: ");
+    const int lowerBound = validateNumber();
+
+    printf("Введите верхнюю границу случайных чисел: ");
+    const int upperBound = validateNumber();
 
     if (lowerBound > upperBound) {
-        fprintf(stderr, "Неправильно введена граница чисел! Нижняя граница не может быть больше верхней.\n");
+        fprintf(stderr, "Неправильно введена граница чисел!\n");
         exit(EXIT_FAILURE);
     }
 
@@ -204,7 +189,7 @@ void fillArrayKeyboard(int* arr, const size_t size) {
     printf("\nВведите %zu целых чисел для заполнения массива:\n", size);
     for (size_t i = 0; i < size; i++) {
         printf("Элемент [%zu]: ", i);
-        arr[i] = validateNumber("");
+        arr[i] = validateNumber();
     }
 }
 
@@ -220,14 +205,15 @@ void printArray(const int* arr, const size_t size) {
 }
 
 int sumEvenElements(const int* arr, const size_t size) {
-    int threshold = validateNumber("Введите пороговое значение: ");
+    printf("Введите пороговое значение: ");
+    int threshold = validateNumber();
+
     int sum = 0;
     for (size_t i = 0; i < size; i++) {
         if (arr[i] % 2 == 0 && arr[i] > threshold) {
             sum += arr[i];
         }
     }
-
     return sum;
 }
 
@@ -240,7 +226,6 @@ int* multiplyEvenPositiveElements(const int* arr, int* arr2, const size_t size) 
             arr2[i] = arr[i];
         }
     }
-
     return arr2;
 }
 
@@ -250,6 +235,9 @@ int searchIndexPair(const int* arr, const size_t size) {
             return i;
         }
     }
-
     return -1;
+}
+
+void freeArray(int* arr) {
+    free(arr);
 }
