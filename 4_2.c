@@ -1,4 +1,4 @@
-﻿#include <stdlib.h>
+#include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
 #include <locale.h>
@@ -12,11 +12,11 @@
 */
 int* IntArray(const size_t size);
 
-/*
+/**
 * @brief Функция проверки ввода размера массива.
 * @return Возвращает значение размера массива, если верное, иначе выдает ошибку.
 */
-int InputArray(void);
+int InputArraySize(void);
 
 /**
  * @brief Получает выбор пользователя для способа заполнения массива.
@@ -35,8 +35,10 @@ void FillingArrayKeyboard(int* arr, const size_t size);
 * @brief Заполняет массив случайными числами в заданном диапазоне.
 * @param arr Указатель на массив.
 * @param size Размер массива.
+* @param DownBound Нижняя граница случайных чисел.
+* @param UpBound Верхняя граница случайных чисел.
 */
-void FullRandomArray(int* arr, const size_t size);
+void FullRandomArray(int* arr, const size_t size, const int DownBound, const int UpBound);
 
 /**
 * @brief Выводит массив на экран.
@@ -96,6 +98,22 @@ void RemoveElementsEndWithZero(const int* arr, int* arr2, const size_t size);
 void ChangeArray(const int* arr, int* arr2, const size_t size);
 
 /**
+ * @brief Функция для безопасного ввода целого числа.
+ * @param value Указатель на переменную, в которую будет записано введенное значение.
+ * @param message Сообщение для пользователя.
+ * @return true если ввод успешен, false в случае ошибки.
+ */
+bool InputInt(int* value, const char* message);
+
+/**
+ * @brief Функция для ввода границ диапазона случайных чисел с проверкой.
+ * @param DownBound Указатель на нижнюю границу.
+ * @param UpBound Указатель на верхнюю границу.
+ * @return true если ввод успешен, false в случае ошибки.
+ */
+bool InputBounds(int* DownBound, int* UpBound);
+
+/**
 * @brief Перечисление для выбора способа заполнения массива.
 */
 enum TASK {
@@ -112,7 +130,7 @@ int main(void)
     srand(time(NULL));
     setlocale(LC_ALL, "Russian");
     puts("Введите количество элементов в массиве: ");
-    size_t size = (size_t)InputArray();
+    size_t size = (size_t)InputArraySize();
 
     int* arr = IntArray(size);
 
@@ -124,9 +142,19 @@ int main(void)
     int choice = getFillChoice();
 
     switch (choice) {
-    case RANDOM:
-        FullRandomArray(arr, size);
+    case RANDOM: {
+        int DownBound = 0;
+        int UpBound = 0;
+        
+        if (!InputBounds(&DownBound, &UpBound)) {
+            fprintf(stderr, "Ошибка ввода границ!\n");
+            free(arr);
+            exit(EXIT_FAILURE);
+        }
+        
+        FullRandomArray(arr, size, DownBound, UpBound);
         break;
+    }
     case KEYBOARD:
         FillingArrayKeyboard(arr, size);
         break;
@@ -165,7 +193,7 @@ int main(void)
     return 0;
 }
 
-int InputArray(void)
+int InputArraySize(void)
 {
     int value;
     printf("Введите размер массива: ");
@@ -202,30 +230,8 @@ int* IntArray(const size_t size)
     return arr;
 }
 
-void FullRandomArray(int* arr, const size_t size)
+void FullRandomArray(int* arr, const size_t size, const int DownBound, const int UpBound)
 {
-    int DownBound, UpBound;
-
-    printf("Введите минимальную границу случайных чисел: ");
-    if (scanf("%d", &DownBound) != 1)
-    {
-        fprintf(stderr, "Ошибка ввода нижней границы!\n");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("Введите максимальную границу случайных чисел: ");
-    if (scanf("%d", &UpBound) != 1)
-    {
-        fprintf(stderr, "Ошибка ввода верхней границы!\n");
-        exit(EXIT_FAILURE);
-    }
-
-    if (DownBound > UpBound)
-    {
-        fprintf(stderr, "Неправильно введена граница чисел!\n");
-        exit(EXIT_FAILURE);
-    }
-
     for (size_t i = 0; i < size; i++)
     {
         arr[i] = rand() % (UpBound - DownBound + 1) + DownBound;
@@ -237,10 +243,11 @@ void FillingArrayKeyboard(int* arr, const size_t size)
     printf("\nВведите %zu целых чисел для заполнения массива:\n", size);
     for (size_t i = 0; i < size; i++)
     {
-        printf("Элемент [%zu]: ", i);
-        int value;
-        if (scanf("%d", &value) != 1)
-        {
+        int value = 0;
+        char message[50];
+        snprintf(message, sizeof(message), "Элемент [%zu]: ", i);
+        
+        if (!InputInt(&value, message)) {
             fprintf(stderr, "Ошибка ввода элемента массива!\n");
             exit(EXIT_FAILURE);
         }
@@ -336,4 +343,37 @@ void ChangeArray(const int* arr, int* arr2, const size_t size)
             arr2[i] = -arr[i];
         }
     }
+}
+
+bool InputInt(int* value, const char* message)
+{
+    if (message != NULL) {
+        printf("%s", message);
+    }
+    
+    if (scanf("%d", value) != 1) {
+        // Очистка буфера ввода в случае ошибки
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+        return false;
+    }
+    return true;
+}
+
+bool InputBounds(int* DownBound, int* UpBound)
+{
+    if (!InputInt(DownBound, "Введите минимальную границу случайных чисел: ")) {
+        return false;
+    }
+    
+    if (!InputInt(UpBound, "Введите максимальную границу случайных чисел: ")) {
+        return false;
+    }
+    
+    if (*DownBound > *UpBound) {
+        fprintf(stderr, "Неправильно введена граница чисел!\n");
+        return false;
+    }
+    
+    return true;
 }
