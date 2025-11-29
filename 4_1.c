@@ -93,7 +93,6 @@ int main() {
 
     int* arr = iArray(size);
 
-    // Выбор способа заполнения массива
     printf("\nКаким способом вы хотите заполнить массив?\n"
         "Случайные числа - %d\n"
         "Ввод с клавиатуры - %d\n", RANDOM, KEYBOARD);
@@ -138,7 +137,7 @@ int main() {
 }
 
 int validateInput(const char* message) {
-    int input;
+    int input = 0;
     printf("%s", message);
 
     if (scanf("%d", &input) != 1 || input <= 0) {
@@ -150,7 +149,7 @@ int validateInput(const char* message) {
 }
 
 int validateNumber() {
-    int input;
+    int input = 0;
     if (scanf("%d", &input) != 1) {
         fprintf(stderr, "Ошибка ввода числа!\n");
         exit(EXIT_FAILURE);
