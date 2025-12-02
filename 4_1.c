@@ -1,4 +1,4 @@
-﻿#include <stdlib.h>
+#include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
 #include <locale.h>
@@ -119,8 +119,8 @@ int main() {
 
     printf("\nМассив после умножения четных положительных элементов на последний элемент: ");
     int* arr2 = iArray(size);
-    printArray(multiplyEvenPositiveElements(arr, arr2, size), size);
-
+    multiplyEvenPositiveElements(arr, arr2, size);
+    printArray(arr2, size);
     freeArray(arr2);
 
     int pairIndex = searchIndexPair(arr, size);
@@ -167,6 +167,11 @@ int* iArray(const size_t size) {
 }
 
 void fillArrayRandom(int* arr, const size_t size) {
+    if (arr == NULL) {
+        fprintf(stderr, "Ошибка: передан NULL указатель в fillArrayRandom\n");
+        return;
+    }
+
     printf("\nВведите нижнюю границу случайных чисел: ");
     const int lowerBound = validateNumber();
 
@@ -185,6 +190,11 @@ void fillArrayRandom(int* arr, const size_t size) {
 }
 
 void fillArrayKeyboard(int* arr, const size_t size) {
+    if (arr == NULL) {
+        fprintf(stderr, "Ошибка: передан NULL указатель в fillArrayKeyboard\n");
+        return;
+    }
+
     printf("\nВведите %zu целых чисел для заполнения массива:\n", size);
     for (size_t i = 0; i < size; i++) {
         printf("Элемент [%zu]: ", i);
@@ -193,6 +203,11 @@ void fillArrayKeyboard(int* arr, const size_t size) {
 }
 
 void printArray(const int* arr, const size_t size) {
+    if (arr == NULL) {
+        fprintf(stderr, "Ошибка: передан NULL указатель в printArray\n");
+        return;
+    }
+
     printf("[");
     for (size_t i = 0; i < size; i++) {
         printf("%d", arr[i]);
@@ -204,6 +219,11 @@ void printArray(const int* arr, const size_t size) {
 }
 
 int sumEvenElements(const int* arr, const size_t size) {
+    if (arr == NULL) {
+        fprintf(stderr, "Ошибка: передан NULL указатель в sumEvenElements\n");
+        return 0;
+    }
+
     printf("Введите пороговое значение: ");
     int threshold = validateNumber();
 
@@ -217,6 +237,11 @@ int sumEvenElements(const int* arr, const size_t size) {
 }
 
 int* multiplyEvenPositiveElements(const int* arr, int* arr2, const size_t size) {
+    if (arr == NULL || arr2 == NULL) {
+        fprintf(stderr, "Ошибка: передан NULL указатель в multiplyEvenPositiveElements\n");
+        return arr2;
+    }
+
     for (size_t i = 0; i < size; i++) {
         if (arr[i] % 2 == 0 && arr[i] > 0) {
             arr2[i] = arr[i] * arr[size - 1];
@@ -229,6 +254,11 @@ int* multiplyEvenPositiveElements(const int* arr, int* arr2, const size_t size) 
 }
 
 int searchIndexPair(const int* arr, const size_t size) {
+    if (arr == NULL) {
+        fprintf(stderr, "Ошибка: передан NULL указатель в searchIndexPair\n");
+        return -1;
+    }
+
     for (size_t i = 0; i < size - 1; i++) {
         if (arr[i] * arr[i + 1] < 0) {
             return i;
@@ -238,5 +268,7 @@ int searchIndexPair(const int* arr, const size_t size) {
 }
 
 void freeArray(int* arr) {
-    free(arr);
+    if (arr != NULL) {
+        free(arr);
+    }
 }
